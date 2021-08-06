@@ -40,7 +40,16 @@ int main(int argc, char *argv[])
   check_brand_string();  
   if(check_processor_family_model_id() != 0) exit(-1);
 
+  printf("num_cores %d\n",num_cores);
+  printf("base_core_id %d\n",base_core_id);
+  printf("num_physical_cores %d\n",num_physical_cores);
   
+  cpu_set_t cpuset;
+  CPU_ZERO(&cpuset);
+  CPU_SET(base_core_id, &cpuset);
+  pthread_t current_thread = pthread_self();    
+  pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset);
+
   PMON * pmon = new PMON(base_core_id,num_cores,num_physical_cores);  
   pmon->check_unique_ppin();
 
@@ -56,7 +65,10 @@ int main(int argc, char *argv[])
   
   pmon->enable_prefetch();
 
-  mem_lines->dump_busy_paths("busy_path." + std::to_string(pmon->get_ppin()) + ".json");
+  std::stringstream ppin_str;
+  ppin_str << std::hex << pmon->get_ppin();
+
+  mem_lines->dump_busy_paths("busy_path." + ppin_str.str() + ".json");
 
   delete mem_lines;  
   delete pmon;

@@ -92,9 +92,9 @@ uint64_t get_physical_address(void * addr) {
 
 
 
+#define NUM_RW_TO_LOCATE_LINE 100000
+#define LLC_LOOKUP_THRES_TO_LOCATE_LINE 2000
 
-#define NUM_RW_TO_LOCATE_LINE 10000000
-#define LLC_LOOKUP_THRES_TO_LOCATE_LINE 200000
 
 int Mem_Lines::initialize_local_lines() {
   local_found_count = 0;
@@ -173,8 +173,9 @@ std::vector<void*> Mem_Lines::get_lines_for_core(int core_id) {
 }
 
 
-#define NUM_RW_TO_MAP_CORE 1000000
-#define RING_TRAFFIC_THRES_TO_MAP_CORE 10000000
+#define NUM_RW_TO_MAP_CORE 10000
+#define RING_TRAFFIC_THRES_TO_MAP_CORE 100000
+
 
 
 int Mem_Lines::map_os_core_id_to_cha_id() {
@@ -236,8 +237,9 @@ int Mem_Lines::find_core_mapping(int ci,int pi,std::vector<core_counters> counte
 
 
 
-#define NUM_RW_TO_LOCATE_CORE 100000000
-#define RING_TRAFFIC_THRES_TO_LOCATE_CORE 1000000
+#define NUM_RW_TO_LOCATE_CORE 10000000
+#define RING_TRAFFIC_THRES_TO_LOCATE_CORE 500000
+
 
 
 int Mem_Lines::generate_traffic_and_monitor() {
@@ -300,7 +302,10 @@ using json = nlohmann::json;
 int Mem_Lines::dump_busy_paths(std::string filename)  {
   json j;
   
-  j["ppin"] = std::to_string(pmon->get_ppin());
+  std::stringstream ppin_str;
+  ppin_str << std::hex << pmon->get_ppin();
+
+  j["ppin"] = ppin_str.str();
 
   j["CHA_to_os"] = json::array();
   for(int i = 0; i < core_map_CHA_to_OS.size(); i ++ ) {

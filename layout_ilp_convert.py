@@ -2,7 +2,7 @@ import json
 import sys
 import queue
 import cvxpy as cp
-import gurobipy
+#import gurobipy
 
 print("Processing:",sys.argv[1])
 with open(sys.argv[1], "r") as busy_path_file:
@@ -123,6 +123,7 @@ for core_id in range(num_cores+len(deprecated)):
   if(max_vid < vid) : max_vid =  vid
   if(max_hid < hid) : max_hid =  hid
 
+print("CHA_ID map")
 print("",end='\t')
 for hid in range(max_hid+1):
   print("({})".format(hid),end='\t')
@@ -136,6 +137,23 @@ for vid in range(max_vid+1):
     else:
       print("*",end='\t')
   print("") 
+
+
+print("\n\nOS core ID map")
+print("",end='\t')
+for hid in range(max_hid+1):
+  print("({})".format(hid),end='\t')
+print("")
+
+for vid in range(max_vid+1): 
+  print("({})".format(vid),end='\t') 
+  for hid in range(max_hid+1):
+    if(vid,hid) in core_map:
+      print("{}".format( CHA_to_os[core_map[(vid,hid)]]),end='\t')
+    else:
+      print("*",end='\t')
+  print("") 
+
 
 mapped = {}
 mapped["ppin"] = path_info["ppin"]
@@ -168,3 +186,5 @@ for hid in range(max_hid+1):
 fn_head = sys.argv[1][:sys.argv[1].rfind(".json")]
 with open(fn_head+'.mapped.json', 'w') as outjson:
   json.dump(mapped, outjson)
+
+
