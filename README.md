@@ -32,9 +32,9 @@ pip3 install cylp
 
 ```cosole
 sudo modprobe msr    #need only once
-sudo ./core_map -b 0 -c <#LLC> -p <#LLC>
+sudo ./core_map -b 0 -c <#CPU> -p <#LLC>
 ```
-
+* The above command will generate a tile-to-tile traffic monitoring file <busy_path.<PPIN>.json file>
 * After obtaining the monitoring file, perform ILP solving to map the processor core locations
 
 ```console
