@@ -251,13 +251,13 @@ void PMON::set_pmon_ring_channels_icl()
 			std::cout << "Write(en & umask & ev_sel & rst) 2 error!" << std::endl;
 		}
 		// Set Cn_MSR_PMON.HORZ_RING_AD_IN_USE.LEFT
-		event_unit = (1ULL << 22ULL) | 0xb3 | (1ULL << 17ULL) | (0b00000011 << 8ULL);
+		event_unit = (1ULL << 22ULL) | 0xb8 | (1ULL << 17ULL) | (0b00000011 << 8ULL);
 		ret = msr_h->write(C_ICL[cha_num].MSR_PMON_CTL[2], event_unit);
 		if(ret != 8) {
 			std::cout << "Write(en & umask & ev_sel & rst) 3 error!" << std::endl;
 		}
 		// Set Cn_MSR_PMON.HORZ_RING_AD_IN_USE.RIGHT
-		event_unit = (1ULL << 22ULL) | 0xb3 | (1ULL << 17ULL) | (0b00001100 << 8ULL);
+		event_unit = (1ULL << 22ULL) | 0xb8 | (1ULL << 17ULL) | (0b00001100 << 8ULL);
 		ret = msr_h->write(C_ICL[cha_num].MSR_PMON_CTL[3], event_unit);
 		if(ret != 8) {
 			std::cout << "Write(en & umask & ev_sel & rst) 4 error!" << std::endl;
@@ -321,6 +321,11 @@ void PMON::set_llc_pmon_icl()
   uint64 event_unit, ret;
 
   for(int cha_num = 0; cha_num < num_physical_cores; cha_num++) {
+    ret = msr_h->write(C_ICL[cha_num].PMON_UNIT_CTL, 0x3);
+    if(ret != 8) {
+        std::cout << "Write(PMON_UNIT_CTL 0x3) error!" << std::endl;
+    }
+
     // Set Cn_MSR_PMON_CTL[0] = TOR_OCCUPANCY.IA_MISS
     event_unit = (1ULL << 22ULL) | 0x36 | (1ULL << 17ULL) | (0b00100001 << 8ULL);
     ret = msr_h->write(C_ICL[cha_num].MSR_PMON_CTL[0], event_unit);
@@ -329,7 +334,7 @@ void PMON::set_llc_pmon_icl()
     }
     // Set Cn_MSR_PMON_CTL[1] = LLC_LOOKUP.ANY                                        <<----!!! find_local_lines use this. LLC_LOOKUP event code = 0x34. Unitmask ANY = 0b00010001 
     // event_unit = (1ULL << 22ULL) | 0x34 | (1ULL << 17ULL) | (0b00010001 << 8ULL);
-    event_unit = (1ULL << 22ULL) | 0x34ULL | (1ULL << 17ULL)  |  (0b100000ULL << 32ULL) ;
+    event_unit = (1ULL << 22ULL) | 0x34ULL | (1ULL << 17ULL)  |  (0x1FFFULL << 32ULL) | (0xFFULL << 8ULL);
     ret = msr_h->write(C_ICL[cha_num].MSR_PMON_CTL[1], event_unit);
     if(ret != 8) {
       std::cout << "Write(en & umask & ev_sel & rst) 2 error!" << std::endl;
@@ -346,20 +351,16 @@ void PMON::set_llc_pmon_icl()
     }
 
     // Set Cn_MSR_PMON_BOX_FILTER   
-    // msr_h->read(C_ICL[cha_num].MSR_PMON_BOX_FILTER, &event_unit);     
-    //event_unit |= (0b100000ULL << 32ULL) ; //ANY_F, M and E state
+    // // msr_h->read(C_ICL[cha_num].MSR_PMON_BOX_FILTER, &event_unit);     
+    // event_unit |= (0b100000ULL << 32ULL) ; //ANY_F, M and E state
     // // event_unit = (0b100000ULL << 32ULL) | (0b01100000 << 8ULL); //ANY_F, M and E state
-    event_unit = 0;
+    // // event_unit = 0;
     
-    ret = msr_h->write(C_ICL[cha_num].MSR_PMON_BOX_FILTER, event_unit);
-    if(ret != 8) {
-      std::cout << "Write(en & umask & ev_sel & rst) 24 error! " << cha_num<< " " << std::hex << C_ICL[cha_num].MSR_PMON_BOX_FILTER  << std::dec<< std::endl;
-    }
-    ret = msr_h->write(C_ICL[cha_num].PMON_UNIT_CTL, 0x3);
-    if(ret != 8) {
-        std::cout << "Write(PMON_UNIT_CTL 0x3) error!" << std::endl;
-    }
-
+    // ret = msr_h->write(C_ICL[cha_num].MSR_PMON_BOX_FILTER, event_unit);
+    // if(ret != 8) {
+    //   std::cout << "Write(en & umask & ev_sel & rst) 24 error! " << cha_num<< " " << std::hex << C_ICL[cha_num].MSR_PMON_BOX_FILTER  << std::dec<< std::endl;
+    // }
+   
   }
 } 
 
