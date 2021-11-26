@@ -336,5 +336,6 @@ int Mem_Lines::dump_busy_paths(std::string filename)  {
    
   std::ofstream o(filename);
   o << std::setw(2) << j << std::endl;
+  return 0;
 }
 

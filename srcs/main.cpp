@@ -37,20 +37,22 @@ int main(int argc, char *argv[])
   }
   if(num_physical_cores==-1) num_physical_cores= num_cores;
 
+  get_processor_count();
   check_brand_string();  
-  if(check_processor_family_model_id() != 0) exit(-1);
+  int processor_model = check_processor_family_model_id();
+  if(processor_model < 0) exit(-1);
+
 
   printf("num_cores %d\n",num_cores);
   printf("base_core_id %d\n",base_core_id);
   printf("num_physical_cores %d\n",num_physical_cores);
-  
   cpu_set_t cpuset;
   CPU_ZERO(&cpuset);
   CPU_SET(base_core_id, &cpuset);
   pthread_t current_thread = pthread_self();    
   pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset);
 
-  PMON * pmon = new PMON(base_core_id,num_cores,num_physical_cores);  
+  PMON * pmon = new PMON(processor_model,base_core_id,num_cores,num_physical_cores);  
   pmon->check_unique_ppin();
 
   pmon->disable_prefetch();

@@ -18,7 +18,7 @@ struct core_counters{
 
 class PMON{
   public:
-    PMON(int _base_core_id, int _num_cores, int _num_physical_cores);
+    PMON(int _processor_model, int _base_core_id, int _num_cores, int _num_physical_cores);
     virtual ~PMON();
 
     int freeze();
@@ -39,10 +39,16 @@ class PMON{
     uint64 get_ppin() {return ppin;}
 
   private:      
+    void set_llc_pmon_skl();
+    void set_llc_pmon_icl();
+    void set_pmon_ring_channels_skl();
+    void set_pmon_ring_channels_icl();
+
     MsrHandle* msr_h;
 
     uint64 ppin;
 
+    int processor_model;
     int base_core_id;
     int num_cores;
     int num_physical_cores;

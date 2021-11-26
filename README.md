@@ -28,6 +28,7 @@ pip3 install cylp
 * NLLC = total L3 cache size in KB (can be identified using 'cat /proc/cpuinfo')  / 1375
   (e.g., cache size      : 33792 KB -> 24 LLCs)
   In many cases, #CPU == #LLC, but some CPUs have LLC-only tiles and #LLC can be larger than #CPU
+* For Ice lake models, NLLC = total L3 cache size in KB (can be identified using 'cat /proc/cpuinfo')  / 1536
 
 
 ```cosole
@@ -41,3 +42,4 @@ sudo ./core_map -b 0 -c <#CPU> -p <#LLC>
 python3 layout_ilp_convert.py <busy_path.<PPIN>.json file>
 ```
 
+53248
