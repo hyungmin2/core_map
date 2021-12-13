@@ -1,11 +1,11 @@
 # Core Map
 
-Map individual processor cores of the Intel Xeon CPUs on the mesh interconnect .
+Map the locations of the processor core tiles of the Intel Xeon CPUs on the mesh interconnect .
 
-* Currently works well only for socket 0 (Need some parameter tuning for socket 1)
-* Need sudo privilege
-* Supports Scalable Gen 1 (Skylake) and Gen2 (Cascade lake)
-* Gen 3 (Ice lake) support will be added soon
+For more details about the mechanism, please refer to our DATE 2022 paper, "Know Your Neighbor: Physically Locating Xeon Processor Cores on the Core Tile Grid"
+
+* **Need sudo privilege**
+* Supports Scalable Gen 1 (Skylake), Gen2 (Cascade lake) and Gen3 (Ice lake)
 
 
 ## Install CVXPY ILP solver interface
@@ -24,17 +24,20 @@ pip3 install cylp
 ```
 
 ## How to use
-* Need to know the number of processor cores (#CPU) and the number of LLC slices (#LLC)
-* NLLC = total L3 cache size in KB (can be identified using 'cat /proc/cpuinfo')  / 1375
-  (e.g., cache size      : 33792 KB -> 24 LLCs)
-  In many cases, #CPU == #LLC, but some CPUs have LLC-only tiles and #LLC can be larger than #CPU
-* For Ice lake models, NLLC = total L3 cache size in KB (can be identified using 'cat /proc/cpuinfo')  / 1536
+* Need to know the number of processor cores (`#CPU`) and the number of LLC slices (`#LLC`)
+* `#CPU` is the number of physical processor cores per socket, excluding the multithreaded (hyperthreaded) cores. 
+* `#LLC` = total L3 cache size in KB (can be identified using 'cat /proc/cpuinfo')  / 1408
+  * (e.g., cache size      : 33792 KB -> 24 LLCs)
+  * In many cases, #CPU == #LLC, but some CPUs have LLC-only tiles and #LLC can be larger than #CPU
+* For the Ice lake models, `#LLC` = total L3 cache size in KB / 1536
+* `#BASE_ID` is the first core ID of the socket. 
+  * For example, if the system is a two-socket system where each CPU chip has 24 cores, `-b 0` maps the CPU on socket 0 and '-b 24' maps the CPU on socket 1.
 
-
-```cosole
+```console
 sudo modprobe msr    #need only once
-sudo ./core_map -b 0 -c <#CPU> -p <#LLC>
+sudo ./core_map -c <#CPU> -p <#LLC> -b <#BASE_ID> 
 ```
+
 * The above command will generate a tile-to-tile traffic monitoring file <busy_path.<PPIN>.json file>
 * After obtaining the monitoring file, perform ILP solving to map the processor core locations
 
@@ -42,4 +45,5 @@ sudo ./core_map -b 0 -c <#CPU> -p <#LLC>
 python3 layout_ilp_convert.py <busy_path.<PPIN>.json file>
 ```
 
-53248
+* If the above layout generation python program fails, try regnerating the the busypath file using the core_map program again.
+  
